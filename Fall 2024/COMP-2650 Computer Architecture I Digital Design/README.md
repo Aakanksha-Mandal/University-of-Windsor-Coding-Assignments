@@ -1,4 +1,4 @@
-# COMP-2650: Computer Architecture I - Digital Design - Labs
+# COMP-2650: Computer Architecture I - Digital Design
 
 This repository contains the lab assignments from **COMP-2650: Computer Architecture I - Digital Design**, completed during my **2nd year** at the **University of Windsor** in **Fall 2024**. The labs focus on understanding the fundamentals of computer architecture, digital logic, and hardware design.
 
