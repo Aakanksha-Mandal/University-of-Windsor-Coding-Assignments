@@ -1,0 +1,54 @@
+import-java.io.*;
+
+terminal-String-2,-3,-4,-5,-6,-7,-8,-9,10,-11,-12,-13,-14,–15,-16,-17,-18,-19,-20,-21;
+non-terminal-String-Program,-MethodDecl,-AssignmentStatement,-Block,-Statement,-StatementList,-FormalParams,-Expression,-MultiplicativeExpr,-PrimaryExpr,-BoolExpression,-ActualParams;
+
+precedence-left-6,-12,-11,-16;
+
+Program::=Program:e{:RESULT="import java.io.*;\npublic class A4 {static BufferedReader br_;static BufferedWriter bw_;" + e + "}";:}
+    |Program:e1-MethodDecl:e2{:RESULT=e1+e2;:}
+    |MethodDecl:e{:RESULT=e;:}; 
+
+MethodDecl::=21:e1-2:e2-7-FormalParams:e3-8-Block:e4{:RESULT="\tpublic static "+e1+e2+"("+e3+") throws Exception{"+e4+"}";:}
+    |21-20-2-7-FormalParams-8-Block:e{:RESULT="\tpublic static void main(String[] args) throws Exception{"+e+"}";:};
+
+FormalParams::={:RESULT="";:}
+    |21:e1-2:e2{:RESULT=e1+e2;:}
+    |21:e1-2:e2-9-FormalParams:e3{:RESULT=e1+e2+", "+e3;:};
+
+Block::=18-StatementList:e-19{:RESULT=e;:};
+
+StatementList::={:RESULT="";:}
+    |Statement:e1-StatementList:e2{:RESULT=e1+e2;:};
+
+Statement::=Block:e{:RESULT=e;:}
+    |21:e1-2:e2-10{:RESULT=e1+e2+";";:}
+    |21:e1-AssignmentStatement:e2{:RESULT=e1+e2;:}
+    |AssignmentStatement:e{:RESULT=e;:}
+    |17-Expression:e2-10{:RESULT="return "+e2+";";:}
+    |15-7-BoolExpression:e1-8-Statement:e2{:RESULT="if("+e1+") {"+e2+"}";:}
+    |15-7-BoolExpression:e1-8-Statement:e2-16-Statement:e3{:RESULT="if("+e1+") {"+e2+"}else {"+e3+"}";:}
+    |13-7-Expression:e1-9-3:e2-8-10{:RESULT="bw_ = new BufferedWriter(new FileWriter("+e2+"));bw_.write(String.valueOf("+e1+"));bw_.close();"; :};
+    |14-7-Expression:e1-9-3:e2-8-10{:RESULT="br_ = new BufferedReader(new FileReader("+e2+"));"+e1+" = Integer.parseInt(br_.readLine());";:};
+
+AssignmentStatement::=2:e1-11-Expression:e2-10-{:RESULT=e1+"="+e2+";";:}
+    |2:e1-11-3:e2-10{:RESULT=e1+"="+e2+";";:};
+
+Expression::=BoolExpression:e1{:RESULT=e1;:}
+    |Expression:e1-6:e2-MultiplicativeExpr:e3{:RESULT=e1+e2+e3;:}
+    |MultiplicativeExpr:e1{:RESULT=e1;:};
+
+MultiplicativeExpr::=PrimaryExpr:e1{:RESULT=e1;:}
+    |MultiplicativeExpr:e1-6:e2-PrimaryExpr:e3{:RESULT=e1+e2+e3;:};
+
+PrimaryExpr::=5:e{:RESULT=e;:}
+    |2:e{:RESULT=e;:}
+    |7-Expression:e-8{:RESULT="("+e+")";:}
+    |2:e1-7-ActualParams:e2-8-{:RESULT=e1+"("+e2+")";:};
+
+BoolExpression::=Expression:e1-12:e2-Expression:e3{:RESULT=e1+e2+e3;:}
+    |4:e{:RESULT=e;:};
+
+ActualParams::={:RESULT="";:}
+    |Expression:e{:RESULT=e;:}
+    |Expression:e1-9-ActualParams:e2{:RESULT=e1+","+e2;:};

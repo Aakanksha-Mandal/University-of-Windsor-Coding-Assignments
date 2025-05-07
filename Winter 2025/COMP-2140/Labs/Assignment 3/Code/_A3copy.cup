@@ -1,0 +1,76 @@
+import java.io.*;
+
+/* Terminals */
+terminal String IDENTIFIER, QUOTEDSTRING;
+terminal Integer NUMBER;
+terminal PLUS, MINUS, TIMES, DIVIDE, LPAREN, RPAREN, COMMA, SEMICOLON, EQUAL, EQ, NE;
+terminal String WRITE, READ, IF, ELSE, RETURN, BEGIN, END, MAIN, STRING, INT_T, REAL_T;
+
+/* Non-terminals */
+non terminal Program, MethodDecl, Type, FormalParams, OptionalFormalParams, Block, Statement, StatementList, AssignmentStatement, Expression, ExpressionRest, MultiplicativeExpr, MultiplicativeExprRest, PrimaryExpr, BoolExpression, ActualParams, OptionalActualParams;
+
+/* Precedences */
+precedence left PLUS, MINUS;
+precedence left TIMES, DIVIDE;
+precedence left EQUAL;
+precedence left EQ, NE;
+precedence left ELSE;
+
+
+/* The grammar */
+Program ::= MethodDecl {:RESULT = 1;:}
+        | MethodDecl Program:e1 {: RESULT = new Integer(((Integer)e1).intValue() + 1); :}; 
+
+MethodDecl ::= Type IDENTIFIER LPAREN OptionalFormalParams RPAREN Block
+        | Type MAIN IDENTIFIER LPAREN OptionalFormalParams RPAREN Block;
+
+Type ::= INT_T | REAL_T | STRING;
+
+OptionalFormalParams ::= FormalParams |;
+
+FormalParams ::= Type IDENTIFIER
+              | Type IDENTIFIER COMMA FormalParams;
+
+Block ::= BEGIN StatementList END;
+
+StatementList ::=
+               | Statement StatementList;
+
+Statement ::= Block
+           | Type IDENTIFIER SEMICOLON
+           | Type AssignmentStatement
+           | AssignmentStatement
+           | RETURN Expression SEMICOLON
+           | IF LPAREN BoolExpression RPAREN Statement
+           | IF LPAREN BoolExpression RPAREN Statement ELSE Statement
+           | WRITE LPAREN Expression COMMA QUOTEDSTRING RPAREN SEMICOLON
+           | READ LPAREN IDENTIFIER COMMA QUOTEDSTRING RPAREN SEMICOLON;
+
+AssignmentStatement ::= IDENTIFIER EQUAL Expression SEMICOLON
+                        | IDENTIFIER EQUAL QUOTEDSTRING SEMICOLON;
+
+Expression ::= MultiplicativeExpr ExpressionRest;
+
+ExpressionRest ::=
+               | PLUS MultiplicativeExpr ExpressionRest
+               | MINUS MultiplicativeExpr ExpressionRest;
+
+MultiplicativeExpr ::= PrimaryExpr MultiplicativeExprRest;
+
+MultiplicativeExprRest ::= 
+                        | TIMES PrimaryExpr MultiplicativeExprRest
+                        | DIVIDE PrimaryExpr MultiplicativeExprRest;
+
+PrimaryExpr ::= NUMBER
+             | IDENTIFIER
+             | LPAREN Expression RPAREN
+             | IDENTIFIER LPAREN OptionalActualParams RPAREN
+             ;
+
+BoolExpression ::= Expression EQ Expression
+                | Expression NE Expression;
+
+OptionalActualParams ::= ActualParams
+            |;
+ActualParams ::= Expression
+            | Expression COMMA ActualParams;

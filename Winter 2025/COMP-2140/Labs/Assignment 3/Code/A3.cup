@@ -1,0 +1,51 @@
+terminal NUMBER, IDENTIFIER, QUOTEDSTRING, OPERATOR, LPAREN, RPAREN, COMMA, SEMICOLON, EQ, WRITE, READ, IF, ELSE, RETURN, BEGIN, END, MAIN, TYPE;
+
+non terminal MethodDecl, FormalParams, OptionalMain, OptionalFormalParams, Block, Statement, StatementList, AssignmentStatement, Expression, PrimaryExpr, BoolExpression, ActualParams, OptionalActualParams;
+non terminal Integer Program;
+
+precedence left ELSE;
+
+Program ::= MethodDecl {:RESULT = 1;:}
+        | MethodDecl Program:e {: RESULT = e + 1; :}; 
+
+MethodDecl ::= TYPE OptionalMain IDENTIFIER LPAREN OptionalFormalParams RPAREN Block;
+
+OptionalMain ::= MAIN |;
+
+OptionalFormalParams ::= FormalParams |;
+
+FormalParams ::= TYPE IDENTIFIER
+              | TYPE IDENTIFIER COMMA FormalParams;
+
+Block ::= BEGIN StatementList END;
+
+StatementList ::=
+               | Statement StatementList;
+
+Statement ::= Block
+           |TYPE IDENTIFIER SEMICOLON
+           |TYPE AssignmentStatement
+           | AssignmentStatement
+           | RETURN Expression SEMICOLON
+           | IF LPAREN BoolExpression RPAREN Statement
+           | IF LPAREN BoolExpression RPAREN Statement ELSE Statement
+           | WRITE LPAREN Expression COMMA QUOTEDSTRING RPAREN SEMICOLON
+           | READ LPAREN IDENTIFIER COMMA QUOTEDSTRING RPAREN SEMICOLON;
+
+AssignmentStatement ::= IDENTIFIER OPERATOR Expression SEMICOLON;
+
+Expression ::= PrimaryExpr | Expression OPERATOR PrimaryExpr;
+
+
+PrimaryExpr ::= NUMBER
+             | IDENTIFIER
+             | LPAREN Expression RPAREN
+             | IDENTIFIER LPAREN OptionalActualParams RPAREN
+             ;
+
+BoolExpression ::= Expression EQ Expression;
+
+OptionalActualParams ::= ActualParams
+            |;
+ActualParams ::= Expression
+            | Expression COMMA ActualParams;

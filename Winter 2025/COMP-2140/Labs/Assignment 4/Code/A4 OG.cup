@@ -1,0 +1,55 @@
+import java.io.*;
+
+terminal String IDENTIFIER, QUOTEDSTRING, BOOL, NUMBER, OPERATOR, LPAREN, RPAREN, COMMA, SEMICOLON, EQUAL, EQ, WRITE, READ, IF, ELSE, RETURN, BEGIN, END, MAIN, TYPE;
+non terminal String Program, Program2, MethodDecl, AssignmentStatement, Block, Statement, StatementList, FormalParams, Expression, MultiplicativeExpr, PrimaryExpr, BoolExpression, ActualParams;
+
+precedence left OPERATOR, EQ, EQUAL, ELSE;
+
+Program2 ::= Program:e {:RESULT="import java.io.*;\npublic class A4 {static BufferedReader br_;static BufferedWriter bw_;" + e + "}";:};
+
+Program::=Program:e1 MethodDecl:e2{:RESULT=e1+e2;:}
+    |MethodDecl:e{:RESULT=e;:}; 
+
+MethodDecl ::= TYPE:e1 IDENTIFIER:e2 LPAREN FormalParams:e3 RPAREN Block:e4 {: RESULT = "\n\tpublic static " + e1 + " " + e2 + "(" + e3 + ") throws Exception{\n" + e4 + "\t}\n"; :}
+            | TYPE MAIN IDENTIFIER LPAREN FormalParams RPAREN Block:e {: RESULT = "\n\tpublic static void main(String[] args) throws Exception{\n" + e + "\n\t}"; :};
+
+FormalParams ::= {: RESULT = ""; :}
+              | TYPE:e1 IDENTIFIER:e2 {: RESULT = e1 + " " + e2; :}
+              | TYPE:e1 IDENTIFIER:e2 COMMA FormalParams:e3 {: RESULT = e1 + " " + e2 + ", " + e3; :};
+
+Block ::= BEGIN StatementList:e END {: RESULT = e; :};
+
+StatementList ::= {: RESULT = ""; :}
+               | Statement:e1 StatementList:e2 {: RESULT = e1 + " " + e2; :};
+
+Statement ::= Block:e {: RESULT = e; :}
+           | TYPE:e1 IDENTIFIER:e2 SEMICOLON {: RESULT = "\t\t" + e1 + " " + e2 + ";\n"; :}
+           | TYPE:e1 AssignmentStatement:e2 {: RESULT = e1 + " " + e2; :}
+           | AssignmentStatement:e {: RESULT = e; :}
+           | RETURN Expression:e2 SEMICOLON {: RESULT = "\t\treturn " + e2 + ";\n"; :}
+           | IF LPAREN BoolExpression:e1 RPAREN Statement:e2 {: RESULT = "\t\tif(" + e1 + ") {\n\t" + e2 + "\n\t}"; :}
+           | IF LPAREN BoolExpression:e1 RPAREN Statement:e2 ELSE Statement:e3 {: RESULT = "\t\tif(" + e1 + ") {\n\t" + e2 + "}\n\telse {\n\t" + e3 + "\t}"; :}
+           | WRITE LPAREN Expression:e1 COMMA QUOTEDSTRING:e2 RPAREN SEMICOLON {: RESULT="bw_ = new BufferedWriter(new FileWriter("+e2+"));bw_.write(String.valueOf("+e1+"));bw_.close();"; :}
+           | READ LPAREN IDENTIFIER:e1 COMMA QUOTEDSTRING:e2 RPAREN SEMICOLON {: RESULT = "\t\tbr_ = new BufferedReader(new FileReader(" + e2 + "));\n\t\t" + e1 + " = Integer.parseInt(br_.readLine());\n"; :};
+
+AssignmentStatement ::= IDENTIFIER:e1 EQUAL Expression:e2 SEMICOLON {: RESULT = "\t\t" + e1 + "=" + e2 + ";\n"; :}
+                     | IDENTIFIER:e1 EQUAL QUOTEDSTRING:e2 SEMICOLON {: RESULT = "\t\t" + e1 + "=" + e2 + ";\n"; :};
+
+Expression ::= BoolExpression:e1 {: RESULT = e1; :}
+            | Expression:e1 OPERATOR:e2 MultiplicativeExpr:e3 {: RESULT = e1 + e2 + e3; :}
+            | MultiplicativeExpr:e1 {: RESULT = e1; :};
+
+MultiplicativeExpr ::= PrimaryExpr:e1 {: RESULT = e1; :}
+                     | MultiplicativeExpr:e1 OPERATOR:e2 PrimaryExpr:e3 {: RESULT = e1 + e2 + e3; :};
+
+PrimaryExpr ::= NUMBER:e {: RESULT = e; :}
+             | IDENTIFIER:e {: RESULT = e; :}
+             | LPAREN Expression:e RPAREN {: RESULT = "(" + e + ")"; :}
+             | IDENTIFIER:e1 LPAREN ActualParams:e2 RPAREN {: RESULT = e1 + "(" + e2 + ")"; :};
+
+BoolExpression ::= Expression:e1 EQ:e2 Expression:e3 {: RESULT = e1 + "" + e2 + "" + e3; :}
+                | BOOL:e {: RESULT = e; :};
+
+ActualParams ::= {: RESULT = ""; :}
+              | Expression:e {: RESULT = e; :}
+              | Expression:e1 COMMA ActualParams:e2 {: RESULT = e1 + ", " + e2; :};
