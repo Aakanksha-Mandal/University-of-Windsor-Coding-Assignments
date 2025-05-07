@@ -1,4 +1,4 @@
-# COMP-2560: System Programming (The Unix Reloaded) - Labs
+# COMP-2560: System Programming (The Unix Reloaded)
 
 This repository contains the lab assignments from **COMP-2560: System Programming (The Unix Reloaded)**, completed during my **2nd year** at the **University of Windsor** in **Fall 2024**. The labs focus on understanding system-level programming concepts and working with Unix-like operating systems.
 
